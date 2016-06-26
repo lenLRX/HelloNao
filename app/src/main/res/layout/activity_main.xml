@@ -23,5 +23,7 @@
 
     <include layout="@layout/content_main"
         android:id="@+id/content" />
+    <include layout="@layout/tree_listview"
+        android:id="@+id/tree" />
 
 </android.support.design.widget.CoordinatorLayout>

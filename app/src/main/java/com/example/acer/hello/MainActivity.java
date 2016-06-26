@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -19,9 +20,11 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.graphics.Color;
+import android.widget.Toast;
 
 import com.aldebaran.qi.AnyObject;
 import com.aldebaran.qi.Session;
@@ -30,6 +33,7 @@ import com.aldebaran.qi.Application;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -164,6 +168,57 @@ public class MainActivity extends AppCompatActivity {
 
         Bonjour.getInstance().Init(getApplicationContext(),textViewHandler,
                 deviceSpinnerHandler,deviceSet);
+
+        ImageView toHideImageView = (ImageView)findViewById(R.id.id_treenode_icon);
+        toHideImageView.setVisibility(View.INVISIBLE);
+        TextView toHideTextView = (TextView)findViewById(R.id.id_treenode_label);
+        toHideTextView.setVisibility(View.INVISIBLE);
+
+        ListView mTree = (ListView) findViewById(R.id.TreeListView);
+        if(mTree == null){
+            System.out.println("mTree is null");
+        }
+        TreeListViewAdapter mAdapter = null;
+        List<BehaviorBean> mDatas2 = new ArrayList<BehaviorBean>();
+        {
+            mDatas2.add(new BehaviorBean(1, 0, "文件管理系统"));
+            mDatas2.add(new BehaviorBean(2, 1, "游戏"));
+            mDatas2.add(new BehaviorBean(3, 1, "文档"));
+            mDatas2.add(new BehaviorBean(4, 1, "程序"));
+            mDatas2.add(new BehaviorBean(5, 2, "war3"));
+            mDatas2.add(new BehaviorBean(6, 2, "刀塔传奇"));
+
+            mDatas2.add(new BehaviorBean(7, 4, "面向对象"));
+            mDatas2.add(new BehaviorBean(8, 4, "非面向对象"));
+
+            mDatas2.add(new BehaviorBean(9, 7, "C++"));
+            mDatas2.add(new BehaviorBean(10, 7, "JAVA"));
+            mDatas2.add(new BehaviorBean(11, 7, "Javascript"));
+            mDatas2.add(new BehaviorBean(12, 8, "C"));
+        }
+        try
+        {
+            mAdapter = new TreeAdapter<BehaviorBean>(mTree, this.getApplicationContext(), mDatas2, 10);
+            mAdapter.setOnTreeNodeClickListener(new TreeListViewAdapter.OnTreeNodeClickListener()
+            {
+                @Override
+                public void onClick(Node node, int position)
+                {
+                    if (node.isLeaf())
+                    {
+                        Toast.makeText(getApplicationContext(), node.getName(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+            });
+
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return;
+        }
+        mTree.setAdapter(mAdapter);
     }
 
     @Override

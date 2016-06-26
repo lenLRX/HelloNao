@@ -59,12 +59,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/deviceSpinner"
-        android:layout_marginBottom="66dp"
-        android:layout_above="@+id/connectButton"
+        android:layout_marginBottom="0dp"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentEnd="false"
         android:layout_alignParentStart="false"
         android:layout_alignParentLeft="false"
         android:layout_alignParentTop="true" />
+
+
 
 </RelativeLayout>
