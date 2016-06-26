@@ -78,7 +78,6 @@ class BonjourThread implements Runnable {
     private NsdManager.ResolveListener mResolveListener = null;
     private Object mNotifyObj = new Object();
     private String protocol = "_nao._tcp";
-    private Boolean Resolving = false;
     private Queue mServiceQueue = new ArrayBlockingQueue(10);
     public BonjourThread(Bonjour bonjour){
         mBonjour = bonjour;
@@ -107,7 +106,7 @@ class BonjourThread implements Runnable {
             }
             else{
                 try {
-                    System.out.println("sleeping");
+                    //System.out.println("sleeping");
                     Thread.sleep(1000, 0);
                 }
                 catch (Exception e){
@@ -115,23 +114,11 @@ class BonjourThread implements Runnable {
                     System.out.println(e.getMessage());
                 }
             }
-
-            /*
-            try {
-                mNotifyObj.wait();
-            }
-            catch (Exception e){
-                e.printStackTrace();
-                System.out.println(e.getMessage());
-            }
-            */
         }
     }
 
     private NsdManager.DiscoveryListener getmDiscoveryListener(){
         return new NsdManager.DiscoveryListener(){
-            private boolean isvalid = true;
-
 
             @Override
             public void onDiscoveryStarted(String regType) {
@@ -140,23 +127,6 @@ class BonjourThread implements Runnable {
 
             @Override
             synchronized public void onServiceFound(NsdServiceInfo service) {
-
-                /*
-                synchronized (Resolving) {
-                    if (Resolving) {
-                        try {
-                            synchronized (mNotifyObj) {
-                                System.out.println("ServiceFound but Waiting");
-                                mNotifyObj.wait();
-                                System.out.println("ServiceFound and notified");
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            System.out.println(e.getMessage());
-                        }
-                    }
-                }
-                */
 
                 // A service was found!  Do something with it.
                 System.out.println("Service discovery success " + service);
@@ -173,15 +143,6 @@ class BonjourThread implements Runnable {
                     e.printStackTrace();
                     System.out.println(e.getMessage());
                 }
-
-                /*
-                mResolveListener = getmResolveListener();
-                synchronized (Resolving){
-                    Resolving = true;
-                }
-                mBonjour.getmNsdManager().resolveService(service, mResolveListener);
-                */
-                isvalid = false;
             }
 
             @Override
@@ -235,9 +196,9 @@ class BonjourThread implements Runnable {
                 mBonjour.getmDeviceSpinnerHandler().sendMessage(msg);
                 try {
                     synchronized (mNotifyObj){
-                        System.out.println("before notify");
+                        //System.out.println("before notify");
                         mNotifyObj.notify();
-                        System.out.println("after notify");
+                        //System.out.println("after notify");
                     }
                 }
                 catch (Exception e){

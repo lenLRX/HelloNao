@@ -45,11 +45,6 @@ public class MainActivity extends AppCompatActivity {
     public EditText ipTextfield = null;
     public boolean imgRunning = false;
     public Object objLock = new Object();
-    public NsdManager.DiscoveryListener mDiscoveryListener = null;
-    public NsdManager.ResolveListener mResolveListener = null;
-    public NsdManager mNsdManager = null;
-    public NsdServiceInfo mService = null;
-    public Object deviceDiscoverLock = new Object();
     public Set deviceSet = new HashSet();
     public ArrayList<String> deviceNames = null;
 
@@ -72,10 +67,6 @@ public class MainActivity extends AppCompatActivity {
         imageView.setVisibility(View.VISIBLE);
 
         text.setTextColor(Color.rgb(0,0,0));
-
-        Context context = getApplicationContext();
-
-        mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
 
         deviceSpinner = (Spinner) findViewById(R.id.deviceSpinner);
         deviceNames = new ArrayList();
@@ -132,8 +123,15 @@ public class MainActivity extends AppCompatActivity {
                 }
                 String ip = editableText.toString();
                 if(Utillity.isIPValid(ip)){
-                    GetImage getImage = new GetImage(textViewHandler,imageViewHandler,"tcp://"+ip+":9559");
-                    new Thread(getImage).start();
+                    //GetImage getImage = new GetImage(textViewHandler,imageViewHandler,"tcp://"+ip+":9559");
+                    //new Thread(getImage).start();
+                    try {
+                        BehaviorManager.getInstance().Init(Naoqi.getInstance("tcp://" + ip + ":9559"));
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                        System.out.println(e.getMessage());
+                    }
                 }
                 else{
                     Message msg = new Message();
@@ -142,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
 
         textViewHandler = new Handler(Looper.getMainLooper()){
             @Override
@@ -165,106 +162,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        //new Thread(new DiscoverThread()).start();
-        //mNsdManager.discoverServices(
-        //        "_naoqi._tcp", NsdManager.PROTOCOL_DNS_SD, getmDiscoveryListener());
-        Bonjour.getInstance().Init(context,textViewHandler,
+        Bonjour.getInstance().Init(getApplicationContext(),textViewHandler,
                 deviceSpinnerHandler,deviceSet);
-        System.out.println("Done!!");
-        System.out.flush();
-
-    }
-
-    private NsdManager.DiscoveryListener getmDiscoveryListener(){
-        return new NsdManager.DiscoveryListener(){
-            private boolean isvalid = true;
-
-            @Override
-            public void onDiscoveryStarted(String regType) {
-                System.out.println("Service discovery started");
-            }
-
-            @Override
-            synchronized public void onServiceFound(NsdServiceInfo service) {
-                if(!isvalid)
-                    return;
-                // A service was found!  Do something with it.
-                System.out.println("Service discovery success " + service);
-                Message msg = new Message();
-                msg.obj = service.getServiceType() + service.getServiceName();
-                textViewHandler.sendMessage(msg);
-
-                deviceSet.add(service.getServiceName());
-                mNsdManager.resolveService(service, getmResolveListener());
-
-
-                isvalid = false;
-                /*
-                synchronized (deviceDiscoverLock) {
-                    if(isvalid && !deviceSet.contains(service.getServiceName())) {
-                        deviceSet.add(service.getServiceName());
-                        mNsdManager.resolveService(service, getmResolveListener());
-                        isvalid = false;
-                        mNsdManager.discoverServices(
-                                "_naoqi._tcp", NsdManager.PROTOCOL_DNS_SD, getmDiscoveryListener());
-                    }
-                */
-
-                //mNsdManager.stopServiceDiscovery(this);
-            }
-
-            @Override
-            public void onServiceLost(NsdServiceInfo service) {
-                // When the network service is no longer available.
-                // Internal bookkeeping code goes here.
-                System.out.println("service lost" + service);
-            }
-
-            @Override
-            public void onDiscoveryStopped(String serviceType) {
-                System.out.println("Discovery stopped: " + serviceType);
-            }
-
-            @Override
-            public void onStartDiscoveryFailed(String serviceType, int errorCode) {
-                System.out.println("onStartDiscoveryFailed: Error code: " + errorCode);
-                if(NsdManager.FAILURE_ALREADY_ACTIVE != errorCode)
-                    mNsdManager.stopServiceDiscovery(this);
-            }
-
-            @Override
-            public void onStopDiscoveryFailed(String serviceType, int errorCode) {
-                System.out.println("onStartDiscoveryFailed: Error code: " + errorCode);
-                mNsdManager.stopServiceDiscovery(this);
-            }
-            public void finalize() throws Throwable{
-                super.finalize();
-                System.out.println("stopping");
-                mNsdManager.stopServiceDiscovery(this);
-            }
-        };
-    }
-
-    private NsdManager.ResolveListener getmResolveListener(){
-        return new NsdManager.ResolveListener() {
-
-            @Override
-            public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-                // Called when the resolve fails.  Use the error code to debug.
-                System.out.println("Resolve failed " + errorCode);
-            }
-
-            @Override
-            synchronized public void onServiceResolved(NsdServiceInfo serviceInfo) {
-                System.out.println("Resolve Succeeded. " + serviceInfo);
-                mService = serviceInfo;
-                int port = mService.getPort();
-                InetAddress host = mService.getHost();
-                Message msg = new Message();
-                msg.obj = serviceInfo.getServiceName()+" @ " + host.toString() + ":"+port;
-                deviceSpinnerHandler.sendMessage(msg);
-            }
-        };
     }
 
     @Override
