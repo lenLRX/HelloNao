@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -86,7 +87,17 @@ public class MainActivity extends AppCompatActivity {
         deviceSpinnerAdapter = new ArrayAdapter<String>(this,R.layout.support_simple_spinner_dropdown_item, deviceNames);
         deviceSpinnerAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         deviceSpinner.setAdapter(deviceSpinnerAdapter);
-
+        deviceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selected = deviceNames.get(position);
+                System.out.println(selected);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                System.out.println("onNothingSelected");
+            }
+        });
         connectButton = (Button) findViewById(R.id.connectButton);
         connectButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -137,6 +148,9 @@ public class MainActivity extends AppCompatActivity {
         //new Thread(new DiscoverThread()).start();
         mNsdManager.discoverServices(
                 "_naoqi._tcp", NsdManager.PROTOCOL_DNS_SD, getmDiscoveryListener());
+        System.out.println("Done!!");
+        System.out.flush();
+
     }
 
     private NsdManager.DiscoveryListener getmDiscoveryListener(){
@@ -149,13 +163,21 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onServiceFound(NsdServiceInfo service) {
+            synchronized public void onServiceFound(NsdServiceInfo service) {
+                if(!isvalid)
+                    return;
                 // A service was found!  Do something with it.
                 System.out.println("Service discovery success " + service);
                 Message msg = new Message();
                 msg.obj = service.getServiceType() + service.getServiceName();
                 textViewHandler.sendMessage(msg);
 
+                deviceSet.add(service.getServiceName());
+                mNsdManager.resolveService(service, getmResolveListener());
+
+
+                isvalid = false;
+                /*
                 synchronized (deviceDiscoverLock) {
                     if(isvalid && !deviceSet.contains(service.getServiceName())) {
                         deviceSet.add(service.getServiceName());
@@ -164,8 +186,9 @@ public class MainActivity extends AppCompatActivity {
                         mNsdManager.discoverServices(
                                 "_naoqi._tcp", NsdManager.PROTOCOL_DNS_SD, getmDiscoveryListener());
                     }
-                }
+                */
 
+                //mNsdManager.stopServiceDiscovery(this);
             }
 
             @Override
