@@ -8,12 +8,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,10 +30,7 @@ import com.aldebaran.qi.Application;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class MainActivity extends AppCompatActivity {
     public String linkStat = "unconnected";
@@ -48,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     public Handler textViewHandler = null;
     public Handler imageViewHandler = null;
     public Handler deviceSpinnerHandler = null;
-    public EditText ipTextfiled = null;
+    public EditText ipTextfield = null;
     public boolean imgRunning = false;
     public Object objLock = new Object();
     public NsdManager.DiscoveryListener mDiscoveryListener = null;
@@ -71,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
 
         text = (TextView) findViewById(R.id.mainText);
 
+        ipTextfield = (EditText) findViewById(R.id.ipInputBox);
+
         imageView = (ImageView)findViewById(R.id.imageView);
 
         imageView.setVisibility(View.VISIBLE);
@@ -90,7 +86,25 @@ public class MainActivity extends AppCompatActivity {
         deviceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selected = deviceNames.get(position);
+                System.out.println("onItemSelected");
+                int backSplashPos = 0;
+                int endPosOfIP = 0;
+                String selected = " ";
+                try {
+                    selected = deviceNames.get(position);
+                    backSplashPos = selected.indexOf("/");
+                    endPosOfIP = selected.indexOf(":");
+
+                    if(backSplashPos > 0 && endPosOfIP > backSplashPos){
+                        String _IP = selected.substring(backSplashPos + 1, endPosOfIP);
+                        ipTextfield.setText(_IP);
+                        System.out.println("IP: " + _IP);
+                    }
+                }
+                catch (NullPointerException e){
+                    e.printStackTrace();
+                }
+
                 System.out.println(selected);
             }
             @Override
@@ -108,8 +122,14 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 imgRunning = true;
-                ipTextfiled = (EditText) findViewById(R.id.ipInputBox);
-                Editable editableText = ipTextfiled.getText();
+
+                Editable editableText;
+                try {
+                    editableText = ipTextfield.getText();
+                }
+                catch (NullPointerException e){
+                    return;
+                }
                 String ip = editableText.toString();
                 if(Utillity.isIPValid(ip)){
                     GetImage getImage = new GetImage(textViewHandler,imageViewHandler,"tcp://"+ip+":9559");
@@ -146,8 +166,10 @@ public class MainActivity extends AppCompatActivity {
         };
 
         //new Thread(new DiscoverThread()).start();
-        mNsdManager.discoverServices(
-                "_naoqi._tcp", NsdManager.PROTOCOL_DNS_SD, getmDiscoveryListener());
+        //mNsdManager.discoverServices(
+        //        "_naoqi._tcp", NsdManager.PROTOCOL_DNS_SD, getmDiscoveryListener());
+        Bonjour.getInstance().Init(context,textViewHandler,
+                deviceSpinnerHandler,deviceSet);
         System.out.println("Done!!");
         System.out.flush();
 
@@ -265,14 +287,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    class DiscoverThread implements  Runnable{
-        @Override
-        public void run(){
-
-        }
-
     }
 
 
@@ -416,6 +430,7 @@ class CrashHandler implements Thread.UncaughtExceptionHandler {
         System.out.println("uncaughtException, thread: " + thread
                 + " name: " + thread.getName() + " id: " + thread.getId() + "exception: "
                 + ex);
+        ex.printStackTrace();
         String threadName = thread.getName();
     }
 
