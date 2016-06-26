@@ -174,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
         TextView toHideTextView = (TextView)findViewById(R.id.id_treenode_label);
         toHideTextView.setVisibility(View.INVISIBLE);
 
+
         ListView mTree = (ListView) findViewById(R.id.TreeListView);
         if(mTree == null){
             System.out.println("mTree is null");
@@ -219,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         mTree.setAdapter(mAdapter);
+
     }
 
     @Override
