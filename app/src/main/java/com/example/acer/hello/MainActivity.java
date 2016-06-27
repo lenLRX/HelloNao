@@ -1,6 +1,7 @@
 package com.example.acer.hello;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
@@ -37,7 +38,6 @@ import java.util.List;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
-    public String linkStat = "unconnected";
     public Button connectButton = null;
     public TextView text = null;
     public ImageView imageView = null;
@@ -66,9 +66,9 @@ public class MainActivity extends AppCompatActivity {
 
         ipTextfield = (EditText) findViewById(R.id.ipInputBox);
 
-        imageView = (ImageView)findViewById(R.id.imageView);
+        //imageView = (ImageView)findViewById(R.id.imageView);
 
-        imageView.setVisibility(View.VISIBLE);
+        //imageView.setVisibility(View.VISIBLE);
 
         text.setTextColor(Color.rgb(0,0,0));
 
@@ -142,6 +142,18 @@ public class MainActivity extends AppCompatActivity {
                     msg.obj = ip + "is invalid\n";
                     textViewHandler.sendMessage(msg);
                 }
+            }
+        });
+
+        Button switchButton = (Button)findViewById(R.id.SwitchToVideoViewButton);
+        switchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.putExtra("fuck","shit");
+                intent.setClass(MainActivity.this,VideoActivity.class);
+                MainActivity.this.startActivity(intent);
+                MainActivity.this.finish();
             }
         });
 
