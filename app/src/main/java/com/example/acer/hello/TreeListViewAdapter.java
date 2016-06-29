@@ -27,6 +27,10 @@ public abstract class TreeListViewAdapter<T> extends BaseAdapter
      */
     protected List<Node> mAllNodes;
 
+    public List<Node> getmNodes(){
+        return mNodes;
+    }
+
     /**
      * 点击的回调接口
      */
@@ -47,25 +51,28 @@ public abstract class TreeListViewAdapter<T> extends BaseAdapter
      *
      * @param mTree
      * @param context
-     * @param datas
+     * @param mNodes
+     * @param mAllNodes
      * @param defaultExpandLevel
      *            默认展开几级树
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
-    public TreeListViewAdapter(ListView mTree, Context context, List<T> datas,
-                               int defaultExpandLevel) throws IllegalArgumentException,
+    public TreeListViewAdapter(ListView mTree, Context context, List<Node> mNodes,
+                               List<Node> mAllNodes,int defaultExpandLevel) throws IllegalArgumentException,
             IllegalAccessException
     {
         mContext = context;
         /**
          * 对所有的Node进行排序
          */
-        mAllNodes = TreeHelper.getSortedNodes(datas, defaultExpandLevel);
+        this.mNodes = mNodes;
+        this.mAllNodes = mAllNodes;
+        //mAllNodes = TreeHelper.getSortedNodes(datas, defaultExpandLevel);
         /**
          * 过滤出可见的Node
          */
-        mNodes = TreeHelper.filterVisibleNode(mAllNodes);
+        //mNodes = TreeHelper.filterVisibleNode(mAllNodes);
         mInflater = LayoutInflater.from(context);
 
         /**
@@ -81,7 +88,7 @@ public abstract class TreeListViewAdapter<T> extends BaseAdapter
 
                 if (onTreeNodeClickListener != null)
                 {
-                    onTreeNodeClickListener.onClick(mNodes.get(position),
+                    onTreeNodeClickListener.onClick(getmNodes().get(position),
                             position);
                 }
             }

@@ -14,11 +14,11 @@ import java.util.List;
  */
 public class TreeAdapter<T> extends TreeListViewAdapter<T>{
 
-    public TreeAdapter(ListView mTree, Context context, List<T> datas,
-                       int defaultExpandLevel) throws IllegalArgumentException,
+    public TreeAdapter(ListView mTree, Context context,List<Node> mNodes,
+                       List<Node> mAllNodes,int defaultExpandLevel) throws IllegalArgumentException,
             IllegalAccessException
     {
-        super(mTree, context, datas, defaultExpandLevel);
+        super(mTree, context, mNodes, mAllNodes, defaultExpandLevel);
     }
 
     @Override

@@ -13,6 +13,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.util.Pair;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -191,21 +192,19 @@ public class MainActivity extends AppCompatActivity {
         BehaviorTreeHandler = new Handler(Looper.getMainLooper()){
             @Override
             public void handleMessage(Message msg) {
-                List<String> stringList = (List<String>)  msg.obj;
+                Pair<List<Node>,List<Node>> pair = (Pair<List<Node>,List<Node>>)  msg.obj;
                 ListView mTree = (ListView) findViewById(R.id.TreeListView);
                 if(mTree == null){
                     System.out.println("mTree is null");
                 }
                 TreeListViewAdapter mAdapter = null;
 
-                String[] stringArray = new String[stringList.size()];
 
-                List<BehaviorBean> mDatas2 =
-                        NodeTree.getBehaviorBeanList(stringList.toArray(stringArray));
 
                 try
                 {
-                    mAdapter = new TreeAdapter<BehaviorBean>(mTree, getApplicationContext(), mDatas2, 10);
+                    mAdapter = new TreeAdapter<BehaviorBean>(mTree,
+                            getApplicationContext(), pair.first , pair.second, 0);
                     mAdapter.setOnTreeNodeClickListener(new TreeListViewAdapter.OnTreeNodeClickListener()
                     {
                         @Override

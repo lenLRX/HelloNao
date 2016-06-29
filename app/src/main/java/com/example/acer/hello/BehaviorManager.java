@@ -2,6 +2,7 @@ package com.example.acer.hello;
 
 import android.os.Handler;
 import android.os.Message;
+import android.util.Pair;
 
 import com.aldebaran.qi.AnyObject;
 import com.aldebaran.qi.Future;
@@ -66,7 +67,16 @@ class BehaviorManagerThread implements Runnable{
             Handler BehaviorTreeHandler = mBehaviorManager.getBehaviorTreeHandler();
             if(BehaviorTreeHandler != null){
                 Message msg = new Message();
-                msg.obj = InstalledBehaviors;
+
+                String[] stringArray = new String[InstalledBehaviors.size()];
+
+                List<BehaviorBean> datas =
+                        NodeTree.getBehaviorBeanList(InstalledBehaviors.toArray(stringArray));
+                List<Node> nodes = TreeHelper.getSortedNodes(datas, 0);
+                List<Node> Allnodes = TreeHelper.filterVisibleNode(nodes);
+                Pair<List<Node>,List<Node>> pair =
+                        new Pair<List<Node>,List<Node>>(nodes,Allnodes );
+                msg.obj = pair;
                 BehaviorTreeHandler.sendMessage(msg);
             }
             /*
