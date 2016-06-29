@@ -53,13 +53,16 @@ public class MainActivity extends AppCompatActivity {
     public Object objLock = new Object();
     public Set deviceSet = new HashSet();
     public ArrayList<String> deviceNames = null;
+    public Toolbar toolbar = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Unconnected");
         setSupportActionBar(toolbar);
+
 
         CrashHandler handler = CrashHandler.getInstance();
         handler.init(getApplicationContext());
@@ -129,10 +132,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 String ip = editableText.toString();
                 if(Utillity.isIPValid(ip)){
-                    //GetImage getImage = new GetImage(textViewHandler,imageViewHandler,"tcp://"+ip+":9559");
-                    //new Thread(getImage).start();
+                    Naoqi.getInstance().init("tcp://" + ip + ":9559");
+                    getToolbar().setTitle("Connected to "+ip);
                     try {
-                        BehaviorManager.getInstance().Init(Naoqi.getInstance("tcp://" + ip + ":9559"));
+                        BehaviorManager.getInstance().Init(Naoqi.getInstance());
                     }
                     catch (Exception e){
                         e.printStackTrace();
@@ -256,6 +259,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public Toolbar getToolbar(){
+        return toolbar;
+    }
 }
 
 

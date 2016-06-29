@@ -127,12 +127,13 @@ class BonjourThread implements Runnable {
 
             @Override
             synchronized public void onServiceFound(NsdServiceInfo service) {
-
                 // A service was found!  Do something with it.
                 System.out.println("Service discovery success " + service);
+                /*
                 Message msg = new Message();
                 msg.obj = service.getServiceType() + service.getServiceName();
                 mBonjour.getmTextViewHandler().sendMessage(msg);
+                */
 
                 mBonjour.getmDeviceSet().add(service.getServiceName());
 
@@ -191,9 +192,11 @@ class BonjourThread implements Runnable {
                 System.out.println("Resolve Succeeded. " + serviceInfo);
                 int port = serviceInfo.getPort();
                 InetAddress host = serviceInfo.getHost();
+
                 Message msg = new Message();
                 msg.obj = serviceInfo.getServiceName()+" @ " + host.toString() + ":"+port;
                 mBonjour.getmDeviceSpinnerHandler().sendMessage(msg);
+
                 try {
                     synchronized (mNotifyObj){
                         //System.out.println("before notify");

@@ -26,7 +26,7 @@ public class GetImage implements Runnable{
         textViewHandler = _textViewHandler;
         imageViewHandler = _imageViewHandler;
         try {
-            naoqi = Naoqi.getInstance(IP);
+            naoqi = Naoqi.getInstance();
         }
         catch (Exception e){
             System.out.println(e.getMessage());

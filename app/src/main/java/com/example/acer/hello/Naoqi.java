@@ -4,7 +4,7 @@ import com.aldebaran.qi.Application;
 import com.aldebaran.qi.Session;
 
 public class Naoqi {
-    private static Naoqi instance = null;
+    private static Naoqi instance = new Naoqi();
 
     private String _IP;
     private Application app;
@@ -12,14 +12,19 @@ public class Naoqi {
 
     private Naoqi(){};
 
-    private void init(String IP){
-        String[] args = new String[2];
-        args[0] = "--qi-url";
-        args[1] = IP;
-        _IP = IP;
+    public void init(String IP){
+        try {
+            String[] args = new String[2];
+            args[0] = "--qi-url";
+            args[1] = IP;
+            _IP = IP;
 
-        app = new Application(args);
-        app.start();
+            app = new Application(args);
+            app.start();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public Session getSession(){
@@ -30,15 +35,7 @@ public class Naoqi {
         return _IP;
     }
 
-    public synchronized static Naoqi getInstance(String IP) throws Exception{
-        if(null == instance){
-            instance = new Naoqi();
-            instance.init(IP);
-        }
-        else{
-            if(!instance._IP.equals(IP))
-                throw new Exception("IP is not equal to the IP we connected!");
-        }
+    public synchronized static Naoqi getInstance() {
         return instance;
     }
 }
