@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     public Handler textViewHandler = null;
     public Handler imageViewHandler = null;
     public Handler deviceSpinnerHandler = null;
+    public Handler BehaviorTreeHandler = null;
     public EditText ipTextfield = null;
     public boolean imgRunning = false;
     public Object objLock = new Object();
@@ -187,51 +188,49 @@ public class MainActivity extends AppCompatActivity {
         toHideTextView.setVisibility(View.INVISIBLE);
 
 
-        ListView mTree = (ListView) findViewById(R.id.TreeListView);
-        if(mTree == null){
-            System.out.println("mTree is null");
-        }
-        TreeListViewAdapter mAdapter = null;
-        List<BehaviorBean> mDatas2 = new ArrayList<BehaviorBean>();
-        {
-            mDatas2.add(new BehaviorBean(1, 0, "文件管理系统"));
-            mDatas2.add(new BehaviorBean(2, 1, "游戏"));
-            mDatas2.add(new BehaviorBean(3, 1, "文档"));
-            mDatas2.add(new BehaviorBean(4, 1, "程序"));
-            mDatas2.add(new BehaviorBean(5, 2, "war3"));
-            mDatas2.add(new BehaviorBean(6, 2, "刀塔传奇"));
-
-            mDatas2.add(new BehaviorBean(7, 4, "面向对象"));
-            mDatas2.add(new BehaviorBean(8, 4, "非面向对象"));
-
-            mDatas2.add(new BehaviorBean(9, 7, "C++"));
-            mDatas2.add(new BehaviorBean(10, 7, "JAVA"));
-            mDatas2.add(new BehaviorBean(11, 7, "Javascript"));
-            mDatas2.add(new BehaviorBean(12, 8, "C"));
-        }
-        try
-        {
-            mAdapter = new TreeAdapter<BehaviorBean>(mTree, this.getApplicationContext(), mDatas2, 10);
-            mAdapter.setOnTreeNodeClickListener(new TreeListViewAdapter.OnTreeNodeClickListener()
-            {
-                @Override
-                public void onClick(Node node, int position)
-                {
-                    if (node.isLeaf())
-                    {
-                        Toast.makeText(getApplicationContext(), node.getName(),
-                                Toast.LENGTH_SHORT).show();
-                    }
+        BehaviorTreeHandler = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(Message msg) {
+                List<String> stringList = (List<String>)  msg.obj;
+                ListView mTree = (ListView) findViewById(R.id.TreeListView);
+                if(mTree == null){
+                    System.out.println("mTree is null");
                 }
+                TreeListViewAdapter mAdapter = null;
 
-            });
+                String[] stringArray = new String[stringList.size()];
 
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            return;
-        }
-        mTree.setAdapter(mAdapter);
+                List<BehaviorBean> mDatas2 =
+                        NodeTree.getBehaviorBeanList(stringList.toArray(stringArray));
+
+                try
+                {
+                    mAdapter = new TreeAdapter<BehaviorBean>(mTree, getApplicationContext(), mDatas2, 10);
+                    mAdapter.setOnTreeNodeClickListener(new TreeListViewAdapter.OnTreeNodeClickListener()
+                    {
+                        @Override
+                        public void onClick(Node node, int position)
+                        {
+                            if (node.isLeaf())
+                            {
+                                Toast.makeText(getApplicationContext(), node.getName(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                    });
+
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                    return;
+                }
+                mTree.setAdapter(mAdapter);
+            }
+        };
+
+        BehaviorManager.getInstance().setBehaviorTreeHandler(BehaviorTreeHandler);
+
 
     }
 

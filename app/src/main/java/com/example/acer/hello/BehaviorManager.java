@@ -1,5 +1,8 @@
 package com.example.acer.hello;
 
+import android.os.Handler;
+import android.os.Message;
+
 import com.aldebaran.qi.AnyObject;
 import com.aldebaran.qi.Future;
 import com.aldebaran.qi.Session;
@@ -11,6 +14,8 @@ import java.util.List;
  */
 public class BehaviorManager {
     private Naoqi naoqi = null;
+
+    private Handler BehaviorTreeHandler = null;
 
     public Naoqi getNaoqi(){
         return naoqi;
@@ -25,6 +30,14 @@ public class BehaviorManager {
     public void Init(Naoqi _naoqi){
         naoqi = _naoqi;
         new Thread(new BehaviorManagerThread(this)).start();
+    }
+
+    public Handler getBehaviorTreeHandler(){
+        return BehaviorTreeHandler;
+    }
+
+    public void setBehaviorTreeHandler(Handler BehaviorTreeHandler){
+        this.BehaviorTreeHandler = BehaviorTreeHandler;
     }
 
     private BehaviorManager() {
@@ -50,9 +63,17 @@ class BehaviorManagerThread implements Runnable{
             System.out.println("called getInstalledBehaviors");
             FInstalledBehaviors.sync();
             List<String> InstalledBehaviors = FInstalledBehaviors.get();
+            Handler BehaviorTreeHandler = mBehaviorManager.getBehaviorTreeHandler();
+            if(BehaviorTreeHandler != null){
+                Message msg = new Message();
+                msg.obj = InstalledBehaviors;
+                BehaviorTreeHandler.sendMessage(msg);
+            }
+            /*
             for(String behavior : InstalledBehaviors){
                 System.out.println(behavior);
             }
+            */
         }
         catch (Exception e){
             e.printStackTrace();
