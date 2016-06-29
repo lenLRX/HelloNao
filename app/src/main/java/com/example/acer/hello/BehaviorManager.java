@@ -9,6 +9,7 @@ import com.aldebaran.qi.Future;
 import com.aldebaran.qi.Session;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by abceq on 2016/6/26.
@@ -17,6 +18,8 @@ public class BehaviorManager {
     private Naoqi naoqi = null;
 
     private Handler BehaviorTreeHandler = null;
+
+    private TreeNodeRoot root = null;
 
     public Naoqi getNaoqi(){
         return naoqi;
@@ -31,6 +34,14 @@ public class BehaviorManager {
     public void Init(Naoqi _naoqi){
         naoqi = _naoqi;
         new Thread(new BehaviorManagerThread(this)).start();
+    }
+
+    public void setRoot(TreeNodeRoot root) {
+        this.root = root;
+    }
+
+    public TreeNodeRoot getRoot() {
+        return root;
     }
 
     public Handler getBehaviorTreeHandler(){
@@ -70,9 +81,12 @@ class BehaviorManagerThread implements Runnable{
 
                 String[] stringArray = new String[InstalledBehaviors.size()];
 
-                List<BehaviorBean> datas =
+                Pair<List<BehaviorBean>,TreeNodeRoot> datas =
                         NodeTree.getBehaviorBeanList(InstalledBehaviors.toArray(stringArray));
-                List<Node> nodes = TreeHelper.getSortedNodes(datas, 0);
+
+                mBehaviorManager.setRoot(datas.second);
+
+                List<Node> nodes = TreeHelper.getSortedNodes(datas.first, 0);
                 List<Node> Allnodes = TreeHelper.filterVisibleNode(nodes);
                 Pair<List<Node>,List<Node>> pair =
                         new Pair<List<Node>,List<Node>>(nodes,Allnodes );

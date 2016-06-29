@@ -2,6 +2,8 @@ package com.example.acer.hello;
 
 
 
+import android.util.Pair;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,9 +21,9 @@ public class NodeTree {
     private Map<String,NodeTree> children = new HashMap<>();
     private int uid = 0;
 
-    public static List<BehaviorBean> getBehaviorBeanList(String[] Behaviors){
+    public static Pair<List<BehaviorBean>,TreeNodeRoot> getBehaviorBeanList(String[] Behaviors){
         List<BehaviorBean> mData = new ArrayList<>();
-        Map<String,NodeTree> root = new HashMap<>();
+        TreeNodeRoot root = new TreeNodeRoot();
 
         for(String str : Behaviors){
             String[] splited = str.split("/");
@@ -32,7 +34,7 @@ public class NodeTree {
                     //System.out.println(segment);
                     if(currNode == null){
 
-                        if (root.containsKey(segment)){
+                        if (root.contains(segment)){
                             currNode = root.get(segment);
                         }
                         else{
@@ -58,11 +60,11 @@ public class NodeTree {
 
         List<BehaviorBean> behaviorBeenList = new ArrayList<BehaviorBean>();
 
-        for(Map.Entry<String,NodeTree> entry : root.entrySet()){
+        for(Map.Entry<String,NodeTree> entry : root.getEntrySet()){
             entry.getValue().traverse(behaviorBeenList);
         }
 
-        return behaviorBeenList;
+        return new Pair<List<BehaviorBean>,TreeNodeRoot>(behaviorBeenList,root);
     }
 
     public NodeTree(String name , @Nullable NodeTree parent){
@@ -108,6 +110,38 @@ public class NodeTree {
         for(Map.Entry<String, NodeTree> childEntery : children.entrySet()){
             childEntery.getValue().traverse(behaviorBeanList);
         }
+    }
+
+    public  NodeTree traverse(String toMatch) {
+        NodeTree toReturn = null;
+        if(children.isEmpty()){
+            if(name == toMatch){
+                return this;
+            }
+        }
+        for(Map.Entry<String, NodeTree> childEntery : children.entrySet()){
+            NodeTree tmp = childEntery.getValue().traverse(toMatch);
+            if(tmp != null){
+                toReturn = tmp;
+            }
+        }
+        return toReturn;
+    }
+
+    public void backTrace(String name){
+        name = "/" + this.name + name;
+        if(parent != null){
+            parent.backTrace(name);
+        }
+    }
+
+    public String backTraceGetFullName() throws Exception{
+        if(children.isEmpty()){
+            throw new Exception("backTraceGetFullName Must be called by A leaf Node");
+        }
+        String bt = "/" + name;
+        backTrace(bt);
+        return bt;
     }
 
     public int getUid(){

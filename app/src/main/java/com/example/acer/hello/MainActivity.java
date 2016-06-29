@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //Toolbar的setTitle方法要在setSupportActionBar(toolbar)之前调用，否则不起作用
         toolbar.setTitle("Unconnected");
         setSupportActionBar(toolbar);
 
@@ -217,6 +218,10 @@ public class MainActivity extends AppCompatActivity {
                             {
                                 Toast.makeText(getApplicationContext(), node.getName(),
                                         Toast.LENGTH_SHORT).show();
+                                //TODO: // FIXME: 2016/6/29 
+                                String FullName = BehaviorManager.getInstance().
+                                        getRoot().traverseAndGetFullName(node.getName());
+                                System.out.println("Behavior :" + FullName + "selected");
                             }
                         }
 
