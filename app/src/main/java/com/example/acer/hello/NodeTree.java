@@ -128,19 +128,20 @@ public class NodeTree {
         return toReturn;
     }
 
-    public void backTrace(String name){
+    public String backTrace(String name){
         name = "/" + this.name + name;
+        //System.out.println(name);
         if(parent != null){
-            parent.backTrace(name);
+            name = parent.backTrace(name);
         }
+        return name;
     }
 
     public String backTraceGetFullName() throws Exception{
-        if(children.isEmpty()){
+        if(!children.isEmpty()){
             throw new Exception("backTraceGetFullName Must be called by A leaf Node");
         }
-        String bt = "/" + name;
-        backTrace(bt);
+        String bt = backTrace("");
         return bt;
     }
 
