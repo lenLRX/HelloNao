@@ -218,9 +218,12 @@ public class MainActivity extends AppCompatActivity {
                             {
                                 Toast.makeText(getApplicationContext(), node.getName(),
                                         Toast.LENGTH_SHORT).show();
+                                System.out.println("onClick : " + node.getName());
                                 String FullName = BehaviorManager.getInstance().
                                         getRoot().traverseAndGetFullName(node.getName());
                                 System.out.println("Behavior : " + FullName + "  selected");
+
+
                             }
                         }
 

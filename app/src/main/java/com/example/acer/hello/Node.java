@@ -46,6 +46,7 @@ public class Node {
         this.id = id;
         this.pId = pId;
         this.name = name;
+        this.isExpand = false;
     }
 
     public int getIcon() {
@@ -142,16 +143,52 @@ public class Node {
 
     /**
      * 设置展开
+     * 展开时只展开一层，收起时收起全部
      *
      * @param isExpand
      */
     public void setExpand(boolean isExpand) {
         this.isExpand = isExpand;
+        //System.out.println("set "+this.getName()+" "+isExpand);
+        //System.out.println("parent"+ ( (parent==null)?"null":parent.getName()) +" is expended:"+isParentExpand());
+        //TODO check it was (!isExpand)
         if (!isExpand) {
-
             for (Node node : children) {
-                node.setExpand(isExpand);
+                node.setExpand(false);
             }
+        }
+        /*
+        else{
+            for (Node node : children) {
+                System.out.println("set "+node.getName()+" "+true);
+                System.out.println("parent"+
+                        ( (node.getParent()==null)?"null":node.getParent()
+                                .getName()) +" is expended:"+
+                        node.isParentExpand());
+                node.setExpand(true , 1);
+            }
+        }
+        */
+    }
+
+    public void setExpand(boolean isExpand, int expendLevel) {
+        //TODO check it was (!isExpand)
+        if (!isExpand) {
+            this.isExpand = false;
+            for (Node node : children) {
+                node.setExpand(false);
+            }
+        }
+        else{
+            if(expendLevel > 0){
+                this.isExpand = true;
+                for (Node node : children) {
+                    System.out.println("set "+node.getName()+" "+true);
+                    node.setExpand(true, expendLevel -1);
+                }
+            }
+            else
+                return;
         }
     }
 

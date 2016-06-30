@@ -72,7 +72,7 @@ public abstract class TreeListViewAdapter<T> extends BaseAdapter
         /**
          * 过滤出可见的Node
          */
-        //mNodes = TreeHelper.filterVisibleNode(mAllNodes);
+        this.mNodes = TreeHelper.filterVisibleNode(mAllNodes);
         mInflater = LayoutInflater.from(context);
 
         /**
@@ -84,13 +84,10 @@ public abstract class TreeListViewAdapter<T> extends BaseAdapter
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id)
             {
+                System.out.println("onItemClick:"+position);
                 expandOrCollapse(position);
 
-                if (onTreeNodeClickListener != null)
-                {
-                    onTreeNodeClickListener.onClick(getmNodes().get(position),
-                            position);
-                }
+
             }
 
         });
@@ -105,14 +102,23 @@ public abstract class TreeListViewAdapter<T> extends BaseAdapter
     public void expandOrCollapse(int position)
     {
         Node n = mNodes.get(position);
-
+        System.out.println(n.getName());
         if (n != null)// 排除传入参数错误异常
         {
             if (!n.isLeaf())
             {
+                System.out.println("n is not leaf");
                 n.setExpand(!n.isExpand());
                 mNodes = TreeHelper.filterVisibleNode(mAllNodes);
                 notifyDataSetChanged();// 刷新视图
+            }
+            else{
+                if (onTreeNodeClickListener != null)
+                {
+                    System.out.println("onTreeNodeClickListener is not null");
+                    onTreeNodeClickListener.onClick(getmNodes().get(position),
+                            position);
+                }
             }
         }
     }

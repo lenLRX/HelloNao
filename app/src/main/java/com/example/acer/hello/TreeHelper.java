@@ -35,6 +35,7 @@ public class TreeHelper {
             // 如果为跟节点，或者上层目录为展开状态
             if (node.isRoot() || node.isParentExpand())
             {
+                System.out.println("Show " + node.getName());
                 setNodeIcon(node);
                 result.add(node);
             }

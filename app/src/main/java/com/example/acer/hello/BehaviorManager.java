@@ -87,7 +87,7 @@ class BehaviorManagerThread implements Runnable{
                 mBehaviorManager.setRoot(datas.second);
 
                 List<Node> nodes = TreeHelper.getSortedNodes(datas.first, 0);
-                List<Node> Allnodes = TreeHelper.filterVisibleNode(nodes);
+                List<Node> Allnodes = nodes;
                 Pair<List<Node>,List<Node>> pair =
                         new Pair<List<Node>,List<Node>>(nodes,Allnodes );
                 msg.obj = pair;
