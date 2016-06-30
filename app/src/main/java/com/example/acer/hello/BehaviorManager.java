@@ -21,6 +21,8 @@ public class BehaviorManager {
 
     private TreeNodeRoot root = null;
 
+    private BehaviorManagerThread behaviorManagerThread = null;
+
     public Naoqi getNaoqi(){
         return naoqi;
     }
@@ -33,7 +35,8 @@ public class BehaviorManager {
 
     public void Init(Naoqi _naoqi){
         naoqi = _naoqi;
-        new Thread(new BehaviorManagerThread(this)).start();
+        behaviorManagerThread = new BehaviorManagerThread(this);
+        new Thread(behaviorManagerThread).start();
     }
 
     public void setRoot(TreeNodeRoot root) {
@@ -52,6 +55,10 @@ public class BehaviorManager {
         this.BehaviorTreeHandler = BehaviorTreeHandler;
     }
 
+    public AnyObject getBehaviorManagerObject(){
+        return behaviorManagerThread.getmNaoqiBehaviorManager();
+    }
+
     private BehaviorManager() {
     }
 }
@@ -59,8 +66,13 @@ public class BehaviorManager {
 class BehaviorManagerThread implements Runnable{
     private BehaviorManager mBehaviorManager = null;
     private AnyObject mNaoqiBehaviorManager = null;
+    private Object notifyObject = new Object();
     public BehaviorManagerThread(BehaviorManager _BehaviorManager){
         mBehaviorManager = _BehaviorManager;
+    }
+
+    public AnyObject getmNaoqiBehaviorManager(){
+        return mNaoqiBehaviorManager;
     }
 
     @Override
@@ -93,15 +105,30 @@ class BehaviorManagerThread implements Runnable{
                 msg.obj = pair;
                 BehaviorTreeHandler.sendMessage(msg);
             }
-            /*
-            for(String behavior : InstalledBehaviors){
-                System.out.println(behavior);
-            }
-            */
         }
         catch (Exception e){
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
+
+
+        while (true){
+            try {
+                synchronized (notifyObject){
+                    notifyObject.wait();
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                break;
+            }
+        }
+    }
+}
+
+class BehaviorTask implements Runnable {
+    @Override
+    public void run(){
+
     }
 }

@@ -32,7 +32,8 @@ public class TreeNodeRoot {
             NodeTree leaf = subRoot.getValue().traverse(lastName);
             if(leaf != null){
                 try {
-                     FullName = leaf.backTraceGetFullName();
+                    FullName = leaf.backTraceGetFullName();
+                    FullName = FullName.substring(1,FullName.length());
                 }
                 catch (Exception e){
                     e.printStackTrace();

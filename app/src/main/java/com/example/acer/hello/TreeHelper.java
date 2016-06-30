@@ -15,7 +15,7 @@ public class TreeHelper {
     {
         List<Node> result = new ArrayList<Node>();
         //将用户数据转化为List<Node>以及设置Node间关系
-        List<Node> nodes = convetData2Node(datas);
+        List<Node> nodes = convertData2Node(datas);
         //拿到根节点
         List<Node> rootNodes = getRootNodes(nodes);
         //排序
@@ -35,7 +35,6 @@ public class TreeHelper {
             // 如果为跟节点，或者上层目录为展开状态
             if (node.isRoot() || node.isParentExpand())
             {
-                System.out.println("Show " + node.getName());
                 setNodeIcon(node);
                 result.add(node);
             }
@@ -43,7 +42,7 @@ public class TreeHelper {
         return result;
     }
 
-    private static <T> List<Node> convetData2Node(List<T> datas)
+    private static <T> List<Node> convertData2Node(List<T> datas)
             throws IllegalArgumentException, IllegalAccessException
 
     {

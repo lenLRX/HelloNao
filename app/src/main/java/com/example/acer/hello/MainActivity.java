@@ -1,6 +1,7 @@
 package com.example.acer.hello;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.nsd.NsdManager;
@@ -10,6 +11,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.design.widget.AppBarLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -29,6 +31,7 @@ import android.graphics.Color;
 import android.widget.Toast;
 
 import com.aldebaran.qi.AnyObject;
+import com.aldebaran.qi.Future;
 import com.aldebaran.qi.Session;
 import com.aldebaran.qi.Application;
 
@@ -219,10 +222,30 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), node.getName(),
                                         Toast.LENGTH_SHORT).show();
                                 System.out.println("onClick : " + node.getName());
-                                String FullName = BehaviorManager.getInstance().
+                                final String FullName = BehaviorManager.getInstance().
                                         getRoot().traverseAndGetFullName(node.getName());
                                 System.out.println("Behavior : " + FullName + "  selected");
 
+                                new AlertDialog.Builder(MainActivity.this).setTitle("确认运行行为？")
+                                        .setMessage("确认要运行 "+FullName + " 吗？")
+                                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                try{
+                                                    final Future<Object> startBehavior = BehaviorManager.getInstance().getBehaviorManagerObject()
+                                                            .call("startBehavior", FullName);
+                                                    System.out.println("startBehavior: "+FullName);
+                                                }
+                                                catch (Exception e){
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        }).setNegativeButton("no", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                }).show();
 
                             }
                         }
