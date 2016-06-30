@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
+    public Button stopBehaviorButton = null;
     public Button connectButton = null;
     public TextView text = null;
     public ImageView imageView = null;
@@ -116,6 +117,22 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("onNothingSelected");
             }
         });
+
+        stopBehaviorButton = (Button) findViewById(R.id.StopBehavior);
+        stopBehaviorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try{
+                    BehaviorManager.getInstance().getBehaviorManagerObject()
+                            .call("stopAllBehaviors");
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
         connectButton = (Button) findViewById(R.id.connectButton);
         connectButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -154,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button switchButton = (Button)findViewById(R.id.SwitchToVideoViewButton);
+        Button switchButton = (Button)findViewById(R.id.SwitchToVideo);
         switchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -190,11 +207,12 @@ public class MainActivity extends AppCompatActivity {
         Bonjour.getInstance().Init(getApplicationContext(),textViewHandler,
                 deviceSpinnerHandler,deviceSet);
 
+        /*
         ImageView toHideImageView = (ImageView)findViewById(R.id.id_treenode_icon);
         toHideImageView.setVisibility(View.INVISIBLE);
         TextView toHideTextView = (TextView)findViewById(R.id.id_treenode_label);
         toHideTextView.setVisibility(View.INVISIBLE);
-
+        */
 
         BehaviorTreeHandler = new Handler(Looper.getMainLooper()){
             @Override

@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -28,14 +29,15 @@ public class TreeAdapter<T> extends TreeListViewAdapter<T>{
         ViewHolder viewHolder = null;
         if (convertView == null)
         {
-            convertView = mInflater.inflate(R.layout.tree_listview, parent, false);
+            convertView = mInflater.inflate(R.layout.tree_list_view, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.icon = (ImageView) convertView
                     .findViewById(R.id.id_treenode_icon);
+            viewHolder.icon.setVisibility(View.VISIBLE);
             viewHolder.label = (TextView) convertView
                     .findViewById(R.id.id_treenode_label);
+            viewHolder.label.setVisibility(View.VISIBLE);
             convertView.setTag(viewHolder);
-
         } else
         {
             viewHolder = (ViewHolder) convertView.getTag();

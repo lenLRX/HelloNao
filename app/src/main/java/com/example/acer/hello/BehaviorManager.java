@@ -100,6 +100,7 @@ class BehaviorManagerThread implements Runnable{
 
                 List<Node> nodes = TreeHelper.getSortedNodes(datas.first, 0);
                 List<Node> Allnodes = nodes;
+                System.out.println("Allnodes.size()"+Allnodes.size());
                 Pair<List<Node>,List<Node>> pair =
                         new Pair<List<Node>,List<Node>>(nodes,Allnodes );
                 msg.obj = pair;
