@@ -15,11 +15,16 @@ import android.widget.ImageView;
  */
 public class VideoActivity extends AppCompatActivity{
 
-    View VideoView = null;
-    Button mReturnButton = null;
-    Button mPlayVideoButton = null;
-    Handler imageViewHandler = null;
-    ImageView imageView = null;
+    public View VideoView = null;
+    public Button mReturnButton = null;
+    public Button mPlayVideoButton = null;
+    public Handler imageViewHandler = null;
+    public ImageView imageView = null;
+
+    public Boolean videoRunning = false;
+
+    public Thread videoThread = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -52,8 +57,23 @@ public class VideoActivity extends AppCompatActivity{
         mPlayVideoButton.setOnClickListener( new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                GetImage getImage = new GetImage(null,imageViewHandler);
-                new Thread(getImage).start();
+                boolean isRunning = false;
+                synchronized (videoRunning){
+                    isRunning = videoRunning;
+                }
+                if(!isRunning){
+                    videoRunning = true;
+                    GetImage getImage = new GetImage(null,imageViewHandler);
+                    videoThread = new Thread(getImage);
+                    videoThread.start();
+                    mPlayVideoButton.setText("停止播放");
+                }
+                else{
+                    videoRunning = false;
+                    videoThread.interrupt();
+                    mPlayVideoButton.setText("播放");
+                }
+
             }
         });
 

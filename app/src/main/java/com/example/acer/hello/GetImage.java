@@ -25,6 +25,7 @@ public class GetImage implements Runnable{
     private final int width = 320;
     private final int height = 240;
 
+
     public GetImage(@Nullable Handler _textViewHandler,@Nullable Handler _imageViewHandler){
         textViewHandler = _textViewHandler;
         imageViewHandler = _imageViewHandler;
@@ -52,13 +53,15 @@ public class GetImage implements Runnable{
 
 
     private void innerLoop() throws Exception{
+        if(Thread.interrupted())
+            throw new Exception("interruped");
         Future<List<Object>> FutureImage = video.<List<Object>>call("getImageRemote",DeviceID);
         FutureImage.sync();
         List<Object> ImageList = FutureImage.get();
         ByteBuffer byteBuffer = (ByteBuffer) ImageList.get(6);
         byte[] imgRawBuffer = byteBuffer.array();
         byte[] ARBG8888 = Utillity.RBG888ToARBG8888(imgRawBuffer);
-        Bitmap bitmap = Bitmap.createBitmap(640, 480, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         ByteBuffer ARBGbuffer = ByteBuffer.wrap(ARBG8888);
         bitmap.copyPixelsFromBuffer(ARBGbuffer);
         _sendMessageToImageView(bitmap);
@@ -71,7 +74,7 @@ public class GetImage implements Runnable{
             Session session = naoqi.getSession();
             video = session.service("ALVideoDevice");
             //_sendMessageToTextView("ALVideoDevice connected\n");
-            Future<String> futureDeviceID = video.<String>call("subscribeCamera", "dut", 0, 2, 11, 30);
+            Future<String> futureDeviceID = video.<String>call("subscribeCamera", "dut", 0, 1, 11, 30);
             DeviceID = futureDeviceID.get();
             //_sendMessageToTextView("subscribeCamera DeviceID:" + DeviceID + "\n");
 

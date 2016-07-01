@@ -190,8 +190,11 @@ public class MainActivity extends AppCompatActivity {
                     connectButton.setText("disconnect");
                 }
                 else{
+                    ipTextfield.setKeyListener(keyListener);
                     Naoqi.getInstance().stop();
                     System.out.println("tried to disconnect");
+                    connectButton.setText("connect");
+                    imgRunning = false;
                 }
 
             }

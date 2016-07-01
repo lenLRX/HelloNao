@@ -5,6 +5,6 @@
 增加posture选项
 增加刚度按钮
 
-恢复视频窗口
+恢复视频窗口//Done
 
 上传package（package manager 模块）
