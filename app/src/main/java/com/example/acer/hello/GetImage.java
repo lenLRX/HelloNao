@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 
 import com.aldebaran.qi.AnyObject;
 import com.aldebaran.qi.Future;
@@ -21,8 +22,10 @@ public class GetImage implements Runnable{
     private Object objLock = new Object();
     private AnyObject video = null;
     private String DeviceID;
+    private final int width = 320;
+    private final int height = 240;
 
-    public GetImage(Handler _textViewHandler,Handler _imageViewHandler,String IP){
+    public GetImage(@Nullable Handler _textViewHandler,@Nullable Handler _imageViewHandler){
         textViewHandler = _textViewHandler;
         imageViewHandler = _imageViewHandler;
         try {
@@ -64,14 +67,13 @@ public class GetImage implements Runnable{
 
     @Override
     public void run(){
-        Session session = naoqi.getSession();
-
         try {
+            Session session = naoqi.getSession();
             video = session.service("ALVideoDevice");
-            _sendMessageToTextView("ALVideoDevice connected\n");
+            //_sendMessageToTextView("ALVideoDevice connected\n");
             Future<String> futureDeviceID = video.<String>call("subscribeCamera", "dut", 0, 2, 11, 30);
             DeviceID = futureDeviceID.get();
-            _sendMessageToTextView("subscribeCamera DeviceID:" + DeviceID + "\n");
+            //_sendMessageToTextView("subscribeCamera DeviceID:" + DeviceID + "\n");
 
             while (true){
                 synchronized (objLock){
@@ -84,13 +86,13 @@ public class GetImage implements Runnable{
                 Date date2 = new Date();
                 long t2 = date2.getTime();
                 Long dt = t2-t1;
-                _sendMessageToTextView(dt.toString() + "ms");
+                System.out.println("spend time : "+dt);
             }
 
         }
         catch (Exception e) {
+            e.printStackTrace();
             System.out.println(e.getMessage());
-            _sendMessageToTextView(e.getMessage());
         }
 
     }

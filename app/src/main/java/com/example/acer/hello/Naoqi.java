@@ -9,6 +9,11 @@ public class Naoqi {
     private String _IP;
     private Application app;
 
+    private boolean running = false;
+
+    public boolean isRunning(){
+        return running;
+    }
 
     private Naoqi(){};
 
@@ -21,13 +26,21 @@ public class Naoqi {
 
             app = new Application(args);
             app.start();
+            running = true;
         }
         catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    public Session getSession(){
+    public void stop(){
+        running = false;
+        app.stop();
+    }
+
+    public Session getSession() throws Exception {
+        if(!running)
+            throw new Exception("disconnected");
         return app.session();
     }
 

@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.method.KeyListener;
 import android.util.Pair;
 import android.view.View;
 import android.view.Menu;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     public Toolbar toolbar = null;
     public Handler runningBehaviorTextViewHandler = null;
     public TextView runningBehaviorTextView = null;
+    public KeyListener keyListener = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,37 +153,47 @@ public class MainActivity extends AppCompatActivity {
         connectButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                boolean running = false;
                 synchronized (objLock){
-                    if(imgRunning)
-                        return;
+                    running = imgRunning;
                 }
 
-                imgRunning = true;
+                if(!running){
+                    imgRunning = true;
 
-                Editable editableText;
-                try {
-                    editableText = ipTextfield.getText();
-                }
-                catch (NullPointerException e){
-                    return;
-                }
-                String ip = editableText.toString();
-                if(Utillity.isIPValid(ip)){
-                    Naoqi.getInstance().init("tcp://" + ip + ":9559");
-                    getToolbar().setTitle("Connected to "+ip);
+                    Editable editableText;
                     try {
-                        BehaviorManager.getInstance().Init(Naoqi.getInstance());
+                        editableText = ipTextfield.getText();
+                        keyListener = ipTextfield.getKeyListener();
+                        ipTextfield.setKeyListener(null);
                     }
-                    catch (Exception e){
-                        e.printStackTrace();
-                        System.out.println(e.getMessage());
+                    catch (NullPointerException e){
+                        return;
                     }
+                    String ip = editableText.toString();
+                    if(Utillity.isIPValid(ip)){
+                        Naoqi.getInstance().init("tcp://" + ip + ":9559");
+                        getToolbar().setTitle("Connected to "+ip);
+                        try {
+                            BehaviorManager.getInstance().Init(Naoqi.getInstance());
+                        }
+                        catch (Exception e){
+                            e.printStackTrace();
+                            System.out.println(e.getMessage());
+                        }
+                    }
+                    else{
+                        Message msg = new Message();
+                        msg.obj = ip + "is invalid\n";
+                        textViewHandler.sendMessage(msg);
+                    }
+                    connectButton.setText("disconnect");
                 }
                 else{
-                    Message msg = new Message();
-                    msg.obj = ip + "is invalid\n";
-                    textViewHandler.sendMessage(msg);
+                    Naoqi.getInstance().stop();
+                    System.out.println("tried to disconnect");
                 }
+
             }
         });
 
@@ -222,12 +234,6 @@ public class MainActivity extends AppCompatActivity {
         Bonjour.getInstance().Init(getApplicationContext(),textViewHandler,
                 deviceSpinnerHandler,deviceSet);
 
-        /*
-        ImageView toHideImageView = (ImageView)findViewById(R.id.id_treenode_icon);
-        toHideImageView.setVisibility(View.INVISIBLE);
-        TextView toHideTextView = (TextView)findViewById(R.id.id_treenode_label);
-        toHideTextView.setVisibility(View.INVISIBLE);
-        */
 
         BehaviorTreeHandler = new Handler(Looper.getMainLooper()){
             @Override

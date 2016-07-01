@@ -99,8 +99,8 @@ class BehaviorManagerThread implements Runnable{
 
     @Override
     public void run(){
-        Session session = mBehaviorManager.getNaoqi().getSession();
         try{
+            Session session = mBehaviorManager.getNaoqi().getSession();
             System.out.println("Thread start");
             mNaoqiBehaviorManager = session.service("ALBehaviorManager");
             System.out.println("ALBehaviorManager Done");
@@ -153,6 +153,7 @@ class BehaviorManagerThread implements Runnable{
                 Thread.sleep(500);
             } catch (Exception e) {
                 e.printStackTrace();
+                return;
             }
         }
 
