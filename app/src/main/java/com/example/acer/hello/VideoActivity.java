@@ -36,6 +36,19 @@ public class VideoActivity extends AppCompatActivity{
     }
 
     @Override
+    protected void onResume(){
+        super.onResume();
+        System.out.println(this.getLocalClassName()+"  resumed");
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        System.out.println(this.getLocalClassName()+"  paused");
+    }
+
+
+    @Override
     protected void onNewIntent(Intent intent){
         super.onNewIntent(intent);
     }

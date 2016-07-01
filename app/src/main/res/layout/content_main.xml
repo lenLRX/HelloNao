@@ -33,8 +33,9 @@
         tools:showIn="@layout/activity_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/deviceSpinner"
-        android:id="@+id/treeLayer">
+        android:layout_below="@+id/runningTextView"
+        android:id="@+id/treeLayer"
+        android:layout_above="@+id/ipInputBox">
 
         <ListView
             android:layout_width="wrap_content"
@@ -108,6 +109,17 @@
         android:layout_above="@+id/SwitchToVideo"
         android:layout_alignRight="@+id/SwitchToVideo"
         android:layout_alignEnd="@+id/SwitchToVideo" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="正在运行的行为："
+        android:id="@+id/runningTextView"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/deviceSpinner" />
 
 
 </RelativeLayout>

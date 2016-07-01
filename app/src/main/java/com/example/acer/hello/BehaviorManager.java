@@ -19,6 +19,8 @@ public class BehaviorManager {
 
     private Handler BehaviorTreeHandler = null;
 
+    private Handler runningBehaviorTextViewHandler = null;
+
     private TreeNodeRoot root = null;
 
     private BehaviorManagerThread behaviorManagerThread = null;
@@ -47,6 +49,14 @@ public class BehaviorManager {
         return root;
     }
 
+    public Handler getRunningBehaviorTextViewHandler(){
+        return runningBehaviorTextViewHandler;
+    }
+
+    public void setRunningBehaviorTextViewHandler(Handler handler){
+        runningBehaviorTextViewHandler = handler;
+    }
+
     public Handler getBehaviorTreeHandler(){
         return BehaviorTreeHandler;
     }
@@ -66,6 +76,7 @@ public class BehaviorManager {
 class BehaviorManagerThread implements Runnable{
     private BehaviorManager mBehaviorManager = null;
     private AnyObject mNaoqiBehaviorManager = null;
+    private List<String> lastResults = null;
     private Object notifyObject = new Object();
     public BehaviorManagerThread(BehaviorManager _BehaviorManager){
         mBehaviorManager = _BehaviorManager;
@@ -73,6 +84,17 @@ class BehaviorManagerThread implements Runnable{
 
     public AnyObject getmNaoqiBehaviorManager(){
         return mNaoqiBehaviorManager;
+    }
+
+    private void getRunningBehaviors(List<String> runningBehaviors){
+        Message msg = new Message();
+        String plainRunningBehaviors = "";
+        for(String bstr:runningBehaviors){
+            plainRunningBehaviors += (bstr + "\n");
+        }
+        msg.obj = plainRunningBehaviors;
+        mBehaviorManager.getRunningBehaviorTextViewHandler().sendMessage(msg);
+        lastResults = runningBehaviors;
     }
 
     @Override
@@ -112,7 +134,29 @@ class BehaviorManagerThread implements Runnable{
             System.out.println(e.getMessage());
         }
 
+        while (true){
+            try {
+                Future<List<String>> runningBehaviorsFuture =
+                        mNaoqiBehaviorManager.call("getRunningBehaviors");
+                runningBehaviorsFuture.sync();
+                List<String> runningBehaviors = runningBehaviorsFuture.get();
+                if(lastResults != null){
+                    if(!lastResults.equals(runningBehaviors)){
+                        getRunningBehaviors(runningBehaviors);
+                    }
+                }
+                else{
+                    getRunningBehaviors(runningBehaviors);
+                }
 
+
+                Thread.sleep(500);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        /*
         while (true){
             try {
                 synchronized (notifyObject){
@@ -124,6 +168,7 @@ class BehaviorManagerThread implements Runnable{
                 break;
             }
         }
+        */
     }
 }
 

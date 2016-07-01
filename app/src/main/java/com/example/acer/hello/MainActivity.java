@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
     public Set deviceSet = new HashSet();
     public ArrayList<String> deviceNames = null;
     public Toolbar toolbar = null;
+    public Handler runningBehaviorTextViewHandler = null;
+    public TextView runningBehaviorTextView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,18 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitle("Unconnected");
         setSupportActionBar(toolbar);
 
+        runningBehaviorTextView = (TextView) findViewById(R.id.runningTextView);
+
+        runningBehaviorTextViewHandler = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(Message msg){
+                runningBehaviorTextView.setText("正在运行的行为："+(String) msg.obj);
+            }
+        };
+
+        BehaviorManager.getInstance().setRunningBehaviorTextViewHandler(runningBehaviorTextViewHandler);
+
+        BehaviorManager.getInstance().setBehaviorTreeHandler(runningBehaviorTextViewHandler);
 
         CrashHandler handler = CrashHandler.getInstance();
         handler.init(getApplicationContext());
@@ -225,8 +239,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 TreeListViewAdapter mAdapter = null;
 
-
-
                 try
                 {
                     mAdapter = new TreeAdapter<BehaviorBean>(mTree,
@@ -309,7 +321,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState){
-        System.out.println("saving state");
+        //System.out.println("saving state");
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        System.out.println(this.getLocalClassName()+"  resumed");
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        System.out.println(this.getLocalClassName()+"  paused");
     }
 
     @Override
