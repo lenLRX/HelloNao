@@ -178,8 +178,9 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.putExtra("fuck","shit");
                 intent.setClass(MainActivity.this,VideoActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 MainActivity.this.startActivity(intent);
-                MainActivity.this.finish();
+                //MainActivity.this.finish();
             }
         });
 
@@ -306,6 +307,15 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState){
+        System.out.println("saving state");
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent){
+        super.onNewIntent(intent);
+    }
 
     public Toolbar getToolbar(){
         return toolbar;

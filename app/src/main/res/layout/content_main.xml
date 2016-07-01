@@ -11,7 +11,14 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.acer.hello.MainActivity"
     tools:showIn="@layout/activity_main"
-    android:id="@+id/content_main">
+    android:id="@+id/content_main"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+    <!--这tm是什么破解决方法
+     android:focusable="true"
+    android:focusableInTouchMode="true"
+    解决文本框自动获取焦点问题
+    -->
 
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -86,7 +93,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SwitchToVideoViewButton"
+        android:text="视频窗口"
         android:id="@+id/SwitchToVideo"
         android:layout_above="@+id/connectButton"
         android:layout_alignParentRight="true"

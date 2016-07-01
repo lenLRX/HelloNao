@@ -192,10 +192,11 @@ class BonjourThread implements Runnable {
                 System.out.println("Resolve Succeeded. " + serviceInfo);
                 int port = serviceInfo.getPort();
                 InetAddress host = serviceInfo.getHost();
-
-                Message msg = new Message();
-                msg.obj = serviceInfo.getServiceName()+" @ " + host.toString() + ":"+port;
-                mBonjour.getmDeviceSpinnerHandler().sendMessage(msg);
+                if(Utillity.isIPValid(host.toString())){
+                    Message msg = new Message();
+                    msg.obj = serviceInfo.getServiceName()+" @ " + host.toString() + ":"+port;
+                    mBonjour.getmDeviceSpinnerHandler().sendMessage(msg);
+                }
 
                 try {
                     synchronized (mNotifyObj){
