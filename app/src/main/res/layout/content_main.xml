@@ -133,5 +133,16 @@
         android:layout_above="@+id/postureSpinner"
         android:layout_alignTop="@+id/StopBehavior" />
 
+    <ImageButton
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:id="@+id/imageButton"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:cropToPadding="false"
+        android:adjustViewBounds="false"
+        android:background="@drawable/stiffness_button_green" />
+
 
 </RelativeLayout>
