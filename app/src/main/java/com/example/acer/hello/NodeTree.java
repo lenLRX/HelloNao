@@ -22,7 +22,6 @@ public class NodeTree {
     private int uid = 0;
 
     public static Pair<List<BehaviorBean>,TreeNodeRoot> getBehaviorBeanList(String[] Behaviors){
-        List<BehaviorBean> mData = new ArrayList<>();
         TreeNodeRoot root = new TreeNodeRoot();
 
         for(String str : Behaviors){
@@ -112,7 +111,7 @@ public class NodeTree {
         }
     }
 
-    public  NodeTree traverse(String toMatch) {
+    public NodeTree traverse(String toMatch) {
         NodeTree toReturn = null;
         if(children.isEmpty()){
             if(name == toMatch){

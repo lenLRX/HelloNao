@@ -2,7 +2,9 @@ package com.example.acer.hello;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by abceq on 2016/6/26.
@@ -17,12 +19,14 @@ public class TreeHelper {
         //将用户数据转化为List<Node>以及设置Node间关系
         List<Node> nodes = convertData2Node(datas);
         //拿到根节点
+
         List<Node> rootNodes = getRootNodes(nodes);
         //排序
         for (Node node : rootNodes)
         {
             addNode(result, node, defaultExpandLevel, 1);
         }
+
         return result;
     }
 
@@ -82,9 +86,29 @@ public class TreeHelper {
             nodes.add(node);
         }
 
+        Map<Integer,Node> nodeMap = new HashMap<Integer,Node>();
+
+        for (int i = 0; i < nodes.size(); i++) {
+            Node n = nodes.get(i);
+            nodeMap.put(i,n);
+        }
+
+        for (int i = 0; i < nodes.size(); i++) {
+            Node n = nodes.get(i);
+            int pid = n.getpId();
+            if(pid > 0){
+                Node parent = nodeMap.get(pid);
+                n.setParent(parent);
+                parent.getChildren().add(n);
+            }
+
+        }
+
         /**
          * 设置Node间，父子关系;让每两个节点都比较一次，即可设置其中的关系
+         * 这样排序，复杂度太高
          */
+        /*
         for (int i = 0; i < nodes.size(); i++)
         {
             Node n = nodes.get(i);
@@ -102,7 +126,7 @@ public class TreeHelper {
                 }
             }
         }
-
+        */
         // 设置图片
         for (Node n : nodes)
         {
