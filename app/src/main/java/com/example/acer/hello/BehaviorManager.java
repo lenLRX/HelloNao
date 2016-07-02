@@ -72,6 +72,10 @@ public class BehaviorManager {
         return behaviorManagerThread.getmNaoqiBehaviorManager();
     }
 
+    public void interrupt(){
+        thread.interrupt();
+    }
+
     private BehaviorManager() {
     }
 }
@@ -110,7 +114,11 @@ class BehaviorManagerThread implements Runnable{
             Future<List<String>> FInstalledBehaviors =
                     mNaoqiBehaviorManager.call("getInstalledBehaviors");
             System.out.println("called getInstalledBehaviors");
+
+            long t3 = System.currentTimeMillis();
             FInstalledBehaviors.sync();
+            System.out.println("FInstalledBehaviors.sync():" + (System.currentTimeMillis() - t3));
+
             List<String> InstalledBehaviors = FInstalledBehaviors.get();
             Handler BehaviorTreeHandler = mBehaviorManager.getBehaviorTreeHandler();
             if(BehaviorTreeHandler != null){
@@ -118,12 +126,17 @@ class BehaviorManagerThread implements Runnable{
 
                 String[] stringArray = new String[InstalledBehaviors.size()];
 
+
+                long t2 = System.currentTimeMillis();
                 Pair<List<BehaviorBean>,TreeNodeRoot> datas =
                         NodeTree.getBehaviorBeanList(InstalledBehaviors.toArray(stringArray));
+                System.out.println("NodeTree.getBehaviorBeanList:" + (System.currentTimeMillis() - t2));
 
                 mBehaviorManager.setRoot(datas.second);
 
+                long t1 = System.currentTimeMillis();
                 List<Node> nodes = TreeHelper.getSortedNodes(datas.first, 0);
+                System.out.println("TreeHelper.getSortedNodes:" + (System.currentTimeMillis() - t1));
                 List<Node> Allnodes = nodes;
                 System.out.println("Allnodes.size()"+Allnodes.size());
                 Pair<List<Node>,List<Node>> pair =

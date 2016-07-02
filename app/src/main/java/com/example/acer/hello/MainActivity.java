@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -53,6 +54,10 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<String> postureNames = null;
     public Handler postureManagerHandler = null;
     public TextView currentPostureView = null;
+    public StiffnessManager stiffnessManager = null;
+    public Handler stiffnessHandler = null;
+    public ImageButton stiffnessButton = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         initSwtichButton();
         initBonjour();
         initPostureManager();
+        initStiffnessManager();
     }
 
     private void initToolbar(){
@@ -210,6 +216,8 @@ public class MainActivity extends AppCompatActivity {
                 else{
                     ipTextfield.setKeyListener(keyListener);
                     Naoqi.getInstance().stop();
+                    postureManager.interrupt();
+                    BehaviorManager.getInstance().interrupt();
                     System.out.println("tried to disconnect");
                     connectButton.setText("connect");
                     imgRunning = false;
@@ -374,6 +382,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void initStiffnessManager(){
+        ImageButton stiffnessButton;
     }
 
     @Override

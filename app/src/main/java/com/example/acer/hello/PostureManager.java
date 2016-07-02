@@ -81,6 +81,11 @@ public class PostureManager {
             e.printStackTrace();
         }
     }
+
+
+    public void interrupt(){
+        thread.interrupt();
+    }
 }
 
 
