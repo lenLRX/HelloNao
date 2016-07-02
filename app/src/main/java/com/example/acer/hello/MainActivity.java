@@ -201,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             BehaviorManager.getInstance().Init(Naoqi.getInstance());
                             postureManager.Init(postureManagerHandler);
+                            stiffnessManager.Init(stiffnessHandler);
                         }
                         catch (Exception e){
                             e.printStackTrace();
@@ -217,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
                     ipTextfield.setKeyListener(keyListener);
                     Naoqi.getInstance().stop();
                     postureManager.interrupt();
+                    stiffnessManager.interrupt();
                     BehaviorManager.getInstance().interrupt();
                     System.out.println("tried to disconnect");
                     connectButton.setText("connect");
@@ -385,7 +387,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initStiffnessManager(){
-        ImageButton stiffnessButton;
+        stiffnessButton = (ImageButton) findViewById(R.id.stiffnessButton);
+        stiffnessManager = new StiffnessManager(Naoqi.getInstance());
+
+        stiffnessHandler = new Handler(Looper.getMainLooper()){
+            private Float prevStiffness = -1.0f;
+
+            @Override
+            public void handleMessage(Message msg){
+                Float stiffness = (Float)msg.obj;
+                if(stiffness != prevStiffness){
+                    if (stiffness < 0.1f){
+                        stiffnessButton.setBackgroundResource(R.drawable.stiffness_button_green);
+                    }
+                    else if(stiffness > 0.9f){
+                        stiffnessButton.setBackgroundResource(R.drawable.stiffness_button_red);
+                    }
+                    else{
+                        stiffnessButton.setBackgroundResource(R.drawable.stiffness_button_orange);
+                    }
+                    prevStiffness = stiffness;
+                }
+
+            }
+        };
+
+        stiffnessButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!stiffnessManager.isRunning())
+                    return;
+                Float stiffness = stiffnessManager.getStiffness();
+                if(stiffness > 0.1){
+                    stiffnessManager.rest();
+                }
+                else{
+                    //stiffnessManager.wakeUp();
+                    stiffnessManager.stiffnessUp();
+                }
+            }
+        });
+
     }
 
     @Override
