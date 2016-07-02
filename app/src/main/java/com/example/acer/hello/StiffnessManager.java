@@ -127,7 +127,7 @@ class StiffnessManagerThread implements Runnable{
                     StiffnessManagerHandler.sendMessage(msg);
                 }
                 stiffnessManager.setStiffness(stiffness.get(0));
-                Thread.sleep(500);
+                Thread.sleep(200);
             }
 
         }

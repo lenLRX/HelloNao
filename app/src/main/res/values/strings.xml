@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">Hello</string>
+    <string name="app_name">FreeNaoController</string>
     <string name="action_settings">Settings</string>
+    <string name="action_author">作者</string>
     <string name="myimageview">myImageView</string>
 </resources>

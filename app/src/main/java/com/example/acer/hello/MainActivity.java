@@ -3,6 +3,7 @@ package com.example.acer.hello;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init(){
+        checkIfFirstRunning();
         initToolbar();
         initRunningBehavior();
         initCrashHandler();
@@ -77,6 +79,48 @@ public class MainActivity extends AppCompatActivity {
         initBonjour();
         initPostureManager();
         initStiffnessManager();
+    }
+
+    private void checkIfFirstRunning(){
+        SharedPreferences sharedPreferences =
+                this.getSharedPreferences("share", MODE_PRIVATE);
+        String _version = sharedPreferences.getString(Version.VersionKeyForSharedPreferences,"none");
+        System.out.println("Got Version in Preferences: "+_version);
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
+
+
+        if(!_version.equals(Version.Version)){
+            //first time
+
+            new AlertDialog.Builder(MainActivity.this).setTitle("免责声明")
+                    .setMessage("本软件供您免费使用。\n" +
+                            "您同意作者未就软件进行任何明示担保，" +
+                            "以及本软件是在不做出任何形式担保的情况下按“现状”提供。" +
+                            "作者不对软件进行任何明示或默示担保，" +
+                            "包括但不限于适用于特定用途、适销性、" +
+                            "可销售品质或不侵犯第三方权利的默示担保。" +
+                            "前述责任排除和限制在适用法律的最大允许范围内有效，" +
+                            "即使补救措施未能有效发挥作用。" +
+                            "作者不为本软件提供支持服务。\n\n"+
+                            "除法律规定不得排除或限制的任何赔偿外，" +
+                            "作者在任何情况下都不对任何损失、损害、索赔或费用，" +
+                            "包括任何间接、相应而生、附带的损失或任何失去的利润或储蓄，" +
+                            "或因业务中断、人身伤害或不履行照顾责任或第三方索赔而引致的任何损害承担任何责任，")
+                    .setPositiveButton("接受", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            editor.putString(Version.VersionKeyForSharedPreferences,Version.Version);
+                            editor.commit();
+                        }
+                    }).setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    System.exit(0);
+                }
+            }).show();
+
+
+        }
     }
 
     private void initToolbar(){
@@ -445,7 +489,18 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_author) {
+                new AlertDialog.Builder(MainActivity.this).setTitle("关于作者")
+                        .setMessage("作者：李睿昕\n" +
+                                "邮箱：545976176@qq.com\n" +
+                                "github地址：https://github.com/lenLRX/HelloNao" +
+                                "版本："+Version.Version+"\n\n" +
+                                "刚刚开始学习java和安卓半个月，这个app还有很多需要改进的地方，如果更新我会发布到github上的。")
+                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        }).show();
             return true;
         }
 
