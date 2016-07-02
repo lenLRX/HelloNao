@@ -3,14 +3,10 @@ package com.example.acer.hello;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.nsd.NsdManager;
-import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,33 +20,24 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.graphics.Color;
 import android.widget.Toast;
 
-import com.aldebaran.qi.AnyObject;
 import com.aldebaran.qi.Future;
-import com.aldebaran.qi.Session;
-import com.aldebaran.qi.Application;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
     public Button stopBehaviorButton = null;
     public Button connectButton = null;
-    public TextView text = null;
-    public ImageView imageView = null;
     public Spinner deviceSpinner = null;
     public ArrayAdapter<String> deviceSpinnerAdapter = null;
-    public Handler textViewHandler = null;
-    public Handler imageViewHandler = null;
     public Handler deviceSpinnerHandler = null;
     public Handler BehaviorTreeHandler = null;
     public EditText ipTextfield = null;
@@ -62,16 +49,38 @@ public class MainActivity extends AppCompatActivity {
     public Handler runningBehaviorTextViewHandler = null;
     public TextView runningBehaviorTextView = null;
     public KeyListener keyListener = null;
+    public PostureManager postureManager = null;
+    public ArrayList<String> postureNames = null;
+    public Handler postureManagerHandler = null;
+    public TextView currentPostureView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        init();
+    }
+
+    private void init(){
+        initToolbar();
+        initRunningBehavior();
+        initCrashHandler();
+        initDeviceSpinner();
+        initStopBehaviorButton();
+        initConnectionButton();
+        initSwtichButton();
+        initBonjour();
+        initPostureManager();
+    }
+
+    private void initToolbar(){
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         //Toolbar的setTitle方法要在setSupportActionBar(toolbar)之前调用，否则不起作用
         toolbar.setTitle("Unconnected");
         setSupportActionBar(toolbar);
+    }
 
+    private void initRunningBehavior(){
         runningBehaviorTextView = (TextView) findViewById(R.id.runningTextView);
 
         runningBehaviorTextViewHandler = new Handler(Looper.getMainLooper()){
@@ -84,19 +93,15 @@ public class MainActivity extends AppCompatActivity {
         BehaviorManager.getInstance().setRunningBehaviorTextViewHandler(runningBehaviorTextViewHandler);
 
         BehaviorManager.getInstance().setBehaviorTreeHandler(runningBehaviorTextViewHandler);
+    }
 
+    private void initCrashHandler(){
         CrashHandler handler = CrashHandler.getInstance();
         handler.init(getApplicationContext());
+    }
 
-        text = (TextView) findViewById(R.id.mainText);
-
+    private void initDeviceSpinner(){
         ipTextfield = (EditText) findViewById(R.id.ipInputBox);
-
-        //imageView = (ImageView)findViewById(R.id.imageView);
-
-        //imageView.setVisibility(View.VISIBLE);
-
-        text.setTextColor(Color.rgb(0,0,0));
 
         deviceSpinner = (Spinner) findViewById(R.id.deviceSpinner);
         deviceNames = new ArrayList();
@@ -134,6 +139,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        deviceSpinnerHandler = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(Message msg){
+                deviceNames.add((String) msg.obj);
+            }
+        };
+
+    }
+
+    private void initStopBehaviorButton(){
+
         stopBehaviorButton = (Button) findViewById(R.id.StopBehavior);
         stopBehaviorButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,7 +163,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
+    private void initConnectionButton(){
 
         connectButton = (Button) findViewById(R.id.connectButton);
         connectButton.setOnClickListener(new View.OnClickListener(){
@@ -176,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
                         getToolbar().setTitle("Connected to "+ip);
                         try {
                             BehaviorManager.getInstance().Init(Naoqi.getInstance());
+                            postureManager.Init(postureManagerHandler);
                         }
                         catch (Exception e){
                             e.printStackTrace();
@@ -185,7 +204,6 @@ public class MainActivity extends AppCompatActivity {
                     else{
                         Message msg = new Message();
                         msg.obj = ip + "is invalid\n";
-                        textViewHandler.sendMessage(msg);
                     }
                     connectButton.setText("disconnect");
                 }
@@ -199,6 +217,9 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void initSwtichButton(){
 
         Button switchButton = (Button)findViewById(R.id.SwitchToVideo);
         switchButton.setOnClickListener(new View.OnClickListener() {
@@ -212,31 +233,12 @@ public class MainActivity extends AppCompatActivity {
                 //MainActivity.this.finish();
             }
         });
+    }
 
-        textViewHandler = new Handler(Looper.getMainLooper()){
-            @Override
-            public void handleMessage(Message msg){
-                text.setText((String) msg.obj);
-            }
-        };
+    private void initBonjour(){
 
-        imageViewHandler = new Handler(Looper.getMainLooper()){
-            @Override
-            public void handleMessage(Message msg){
-                imageView.setImageBitmap((Bitmap)msg.obj);
-            }
-        };
-
-        deviceSpinnerHandler = new Handler(Looper.getMainLooper()){
-            @Override
-            public void handleMessage(Message msg){
-                deviceNames.add((String) msg.obj);
-            }
-        };
-
-        Bonjour.getInstance().Init(getApplicationContext(),textViewHandler,
+        Bonjour.getInstance().Init(getApplicationContext(),
                 deviceSpinnerHandler,deviceSet);
-
 
         BehaviorTreeHandler = new Handler(Looper.getMainLooper()){
             @Override
@@ -303,7 +305,75 @@ public class MainActivity extends AppCompatActivity {
 
         BehaviorManager.getInstance().setBehaviorTreeHandler(BehaviorTreeHandler);
 
+    }
 
+    private void initPostureManager(){
+        Spinner postureSpinner = (Spinner) findViewById(R.id.postureSpinner);
+        postureNames = new ArrayList<String>();
+        for(Map.Entry<PostureManager.Postures,String> entry :
+                PostureManager.enumToString.entrySet()){
+            String str = entry.getValue();
+            postureNames.add(str);
+        }
+        ArrayAdapter<String> postureSpinnerAdapter = new ArrayAdapter<String>(this,R.layout.support_simple_spinner_dropdown_item, postureNames);
+        postureSpinnerAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        postureSpinner.setAdapter(postureSpinnerAdapter);
+
+        postureManager = new PostureManager(Naoqi.getInstance());
+
+        currentPostureView = (TextView) findViewById(R.id.currentPosture);
+
+        postureManagerHandler = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(Message msg){
+                currentPostureView.setText("机器人姿态："+(String) msg.obj);
+            }
+        };
+
+        postureSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            private boolean fistTime = true;
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(fistTime){
+                    fistTime = false;
+                    return;
+                }
+                String selected = null;
+                try {
+                    final String _selected = postureNames.get(position);
+                    selected = _selected;
+                    new AlertDialog.Builder(MainActivity.this).setTitle("确认更改姿态？")
+                            .setMessage("确认要改变姿态到 "+ selected + " 吗？")
+                            .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    try{
+                                        postureManager.gotoPosture(_selected);
+                                        System.out.println("startBehavior: " + _selected);
+                                    }
+                                    catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }).setNegativeButton("no", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    }).show();
+
+                }
+                catch (NullPointerException e){
+                    e.printStackTrace();
+                }
+
+                System.out.println("postureSpinner: " + selected);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     @Override
@@ -352,122 +422,6 @@ public class MainActivity extends AppCompatActivity {
 
     public Toolbar getToolbar(){
         return toolbar;
-    }
-}
-
-
-
-
-class MyThread implements Runnable {
-
-    Handler mainActivityHandler = null;
-
-    public  MyThread(Handler _mainActivityHandler){
-        mainActivityHandler = _mainActivityHandler;
-    }
-
-    private void _sendMessage(String str){
-        Message msg = new Message();
-        msg.obj = str;
-        mainActivityHandler.sendMessage(msg);
-    }
-
-    @Override
-    public void run() {
-        _sendMessage("Thread started\n");
-
-        String[] args = new String[2];
-        args[0] = "--qi-url";
-        args[1] = "tcp://192.168.1.112:9559";
-        System.out.println("going to new App!!");
-        System.out.flush();
-        Application app = null;
-        try {
-            app = new Application(args);
-            System.out.println("app success");
-            _sendMessage("Create app success\n");
-        }
-        catch (Exception e){
-            _sendMessage(e.getMessage());
-            System.out.println(e.getMessage());
-            System.out.flush();
-        }
-
-        try{
-            app.start();
-            _sendMessage("app successfully started\n");
-            System.out.println("app successfully started\n");
-        }
-        catch (Exception e){
-            _sendMessage(e.getMessage());
-            System.out.println(e.getMessage());
-            System.out.flush();
-        }
-
-        Session client = null;
-
-        try{
-            client = app.session();
-            if(client.isConnected())
-                System.out.println("connected");
-            else
-                System.out.println("unconnected");
-        }
-        catch (Exception e){
-            _sendMessage(e.getMessage());
-            System.out.println(e.getMessage());
-            System.out.flush();
-        }
-
-
-        try{
-            client.service("ALMemory");
-            System.out.println("ALMemory success!! \n");
-            _sendMessage("ALMemory success!! \n");
-        }
-        catch (Exception e){
-            _sendMessage(e.getMessage());
-            System.out.println(e.getMessage());
-            System.out.flush();
-        }
-
-        AnyObject motionProxy = null;
-
-        try{
-            motionProxy = client.service("ALMotion");
-            System.out.println("ALMotion connected\n");
-            _sendMessage("ALMotion connected\n");
-        }
-        catch (Exception e){
-            _sendMessage(e.getMessage());
-            System.out.println(e.getMessage());
-            System.out.flush();
-        }
-
-        try{
-            motionProxy.call("setStiffnesses", "Body", 1.0f).sync();
-            System.out.println("setStiffneesses done\n");
-            _sendMessage("setStiffneesses done\n");
-        }
-        catch (Exception e){
-            _sendMessage(e.getMessage());
-            System.out.println(e.getMessage());
-            System.out.flush();
-        }
-
-        try{
-            _sendMessage("Ready to move\n");
-            motionProxy.call("moveTo", 10.0f, 0.0f,2.0f).sync();
-            System.out.println("move done\n");
-            _sendMessage("move done\n");
-        }
-        catch (Exception e){
-            _sendMessage(e.getMessage());
-            System.out.println(e.getMessage());
-            System.out.flush();
-        }
-
-
     }
 }
 

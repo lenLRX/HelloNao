@@ -86,8 +86,6 @@ public abstract class TreeListViewAdapter<T> extends BaseAdapter
             {
                 System.out.println("onItemClick:"+position);
                 expandOrCollapse(position);
-
-
             }
 
         });

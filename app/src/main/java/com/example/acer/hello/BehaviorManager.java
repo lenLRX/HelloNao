@@ -25,6 +25,8 @@ public class BehaviorManager {
 
     private BehaviorManagerThread behaviorManagerThread = null;
 
+    private Thread thread = null;
+
     public Naoqi getNaoqi(){
         return naoqi;
     }
@@ -38,7 +40,8 @@ public class BehaviorManager {
     public void Init(Naoqi _naoqi){
         naoqi = _naoqi;
         behaviorManagerThread = new BehaviorManagerThread(this);
-        new Thread(behaviorManagerThread).start();
+        thread = new Thread(behaviorManagerThread);
+        thread.start();
     }
 
     public void setRoot(TreeNodeRoot root) {
@@ -101,7 +104,7 @@ class BehaviorManagerThread implements Runnable{
     public void run(){
         try{
             Session session = mBehaviorManager.getNaoqi().getSession();
-            System.out.println("Thread start");
+            System.out.println("BehaviorManager Thread start");
             mNaoqiBehaviorManager = session.service("ALBehaviorManager");
             System.out.println("ALBehaviorManager Done");
             Future<List<String>> FInstalledBehaviors =
@@ -170,12 +173,5 @@ class BehaviorManagerThread implements Runnable{
             }
         }
         */
-    }
-}
-
-class BehaviorTask implements Runnable {
-    @Override
-    public void run(){
-
     }
 }

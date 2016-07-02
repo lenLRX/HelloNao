@@ -21,7 +21,6 @@ public class Bonjour {
     private BonjourThread mBonjourThread = null;
     private Thread mThread = null;
     private Handler mDeviceSpinnerHandler = null;
-    private Handler mTextViewHandler = null;
     private Set mDeviceSet = null;
 
     public NsdManager getmNsdManager(){
@@ -34,10 +33,6 @@ public class Bonjour {
 
     public Thread getmThread(){
         return mThread;
-    }
-
-    public Handler getmTextViewHandler(){
-        return mTextViewHandler;
     }
 
     public Handler getmDeviceSpinnerHandler(){
@@ -56,12 +51,11 @@ public class Bonjour {
         return ourInstance;
     }
 
-    public void Init(Context ctx,Handler textViewHandler,Handler deviceSpinnerHandler,Set deviceSet){
+    public void Init(Context ctx,Handler deviceSpinnerHandler,Set deviceSet){
         mNsdManager = (NsdManager) ctx.getSystemService(Context.NSD_SERVICE);
         mBonjourThread = new BonjourThread(this);
         mThread = new Thread(mBonjourThread);
         mDeviceSet = deviceSet;
-        mTextViewHandler = textViewHandler;
         mDeviceSpinnerHandler = deviceSpinnerHandler;
 
         System.out.println("Bonjour Inited");
